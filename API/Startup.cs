@@ -1,5 +1,6 @@
 ﻿using API.Middleware;
 using IdentityServer4.AccessTokenValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -29,7 +30,13 @@ namespace API
                         options.Authority = "https://localhost:44326/";
                         options.ApiName = "Exchange";
                     });
-
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("read-orders", builder =>
+                {
+                    builder.RequireScope("orders:read");
+                });
+            });
             services.AddSwaggerDocument(config =>
             {
                 config.Title = "Exchange API";
@@ -55,6 +62,8 @@ namespace API
             app.UseAuthentication();
             app.UseMiddleware<DuplicateRequestMiddleware>();
             app.UseRouting();
+            app.UseCors(configurePolicy => configurePolicy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
                 {
                     endpoints.MapControllers();

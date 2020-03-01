@@ -755,6 +755,16 @@ namespace Entity
             {
                 entity.ToTable("user_credentials");
 
+                entity.HasIndex(e => e.TwoFactorKey)
+                    .HasName("user_credentials.ux_two_factor_key")
+                    .IsUnique()
+                    .HasFilter("((is_deleted = false) AND (two_factor_enabled = true))");
+
+                entity.HasIndex(e => e.UserId)
+                    .HasName("user_credentials.ux_user_id")
+                    .IsUnique()
+                    .HasFilter("(is_deleted = false)");
+
                 entity.Property(e => e.Id).HasColumnName("id");
 
                 entity.Property(e => e.CreatedOn)
@@ -787,11 +797,17 @@ namespace Entity
                     .HasColumnName("salt")
                     .HasMaxLength(250);
 
+                entity.Property(e => e.TwoFactorEnabled).HasColumnName("two_factor_enabled");
+
+                entity.Property(e => e.TwoFactorKey)
+                    .HasColumnName("two_factor_key")
+                    .HasMaxLength(1024);
+
                 entity.Property(e => e.UserId).HasColumnName("user_id");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.UserCredentials)
-                    .HasForeignKey(d => d.UserId)
+                    .WithOne(p => p.UserCredentials)
+                    .HasForeignKey<UserCredentials>(d => d.UserId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("user_credentials_user_id_fkey");
             });

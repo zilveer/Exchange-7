@@ -27,7 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastru
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth", "Auth\Auth.csproj", "{684C89DB-F61D-4499-AF11-94106DF0FFA0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp", "WebApp\WebApp.csproj", "{0A1FC1DA-D0D4-4C5B-B634-C3C9C9378727}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApp", "WebApp\WebApp.csproj", "{0A1FC1DA-D0D4-4C5B-B634-C3C9C9378727}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logic.Tests", "Logic.Tests\Logic.Tests.csproj", "{D40DF353-9701-440F-9D80-42A352CE6C64}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,12 +85,17 @@ Global
 		{0A1FC1DA-D0D4-4C5B-B634-C3C9C9378727}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A1FC1DA-D0D4-4C5B-B634-C3C9C9378727}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A1FC1DA-D0D4-4C5B-B634-C3C9C9378727}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D40DF353-9701-440F-9D80-42A352CE6C64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D40DF353-9701-440F-9D80-42A352CE6C64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D40DF353-9701-440F-9D80-42A352CE6C64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D40DF353-9701-440F-9D80-42A352CE6C64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FDD8A7ED-D6E7-40E4-9EED-4B5CD7387CD0} = {F2394637-9208-4290-B5D5-4A766EE01EF9}
+		{D40DF353-9701-440F-9D80-42A352CE6C64} = {F2394637-9208-4290-B5D5-4A766EE01EF9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90AC4111-E79C-4C9B-BBA7-F49AA77B456C}

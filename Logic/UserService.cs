@@ -13,6 +13,11 @@ namespace Logic
             _readonlyContext = readOnlyContext;
         }
 
+        public Users GetByUniqueId(string uniqueId)
+        {
+            return _readonlyContext.UserReadOnlyRepository.GetByUniqueId(uniqueId);
+        }
+
         public Users GetUser(string email)
         {
             return _readonlyContext.UserReadOnlyRepository.GetUser(email);

@@ -47,30 +47,9 @@ namespace DataAccess.Repository
             };
         }
 
-        public List<OrderResponseModel> GetOrdersForApi(int userId, int pageNumber = 1, int pageSize = 50)
+        public List<Orders> GetOrders(int userId, int pageNumber = 1, int pageSize = 50)
         {
-            return DbSet.Where(x => x.UserId == userId).OrderBy(x => x.CreatedOn).Skip((pageNumber - 1) * pageSize).Take(pageSize)
-                .Select(x => new OrderResponseModel
-                {
-                    CancelOn = x.CancelOn,
-                    CreatedOn = x.CreatedOn,
-                    Fee = x.Fee.ToCoin(),
-                    FeeCurrencyId = x.FeeCurrencyId,
-                    Id = x.Id,
-                    IsBuy = x.Side,
-                    LockedBalance = x.LockedBalance.ToCoin(),
-                    MarketId = x.MarketId,
-                    OrderCondition = x.OrderCondition,
-                    OrderStatus = x.OrderStatus,
-                    OrderType = x.OrderType,
-                    Quantity = x.Quantity.ToCoin(),
-                    QuantityExecuted = x.QuantityExecuted.ToCoin(),
-                    QuantityRemaining = x.QuantityRemaining.ToCoin(),
-                    Rate = x.Rate,
-                    StopRate = x.StopRate,
-                    TradeFeeId = x.TradeFeeId,
-                    IcebergQuantity = x.IcebergQuantity.HasValue ? x.IcebergQuantity.Value.ToCoin() : (decimal?)null
-                }).ToList();
+            return DbSet.Where(x => x.UserId == userId).OrderBy(x => x.CreatedOn).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
         }
     }
 }

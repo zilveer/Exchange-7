@@ -8,7 +8,7 @@ namespace Logic
     public interface IOrderService
     {
         Orders FindById(int id);
-        BusinessOperationResult<Orders> PlaceOrder(int userId, OrderRequestModel orderRequestModel);
+        BusinessOperationResult<OrderResponseModel> PlaceOrder(int userId, OrderRequestModel orderRequestModel);
         List<OrderResponseModel> GetOrdersForApi(int userId, int pageNumber = 1, int pageSize = 50);
     }
 }

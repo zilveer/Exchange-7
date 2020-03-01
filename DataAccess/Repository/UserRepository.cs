@@ -1,5 +1,6 @@
 ﻿using Entity;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 
 namespace DataAccess.Repository
@@ -10,6 +11,12 @@ namespace DataAccess.Repository
         public UserRepository(DbSet<Users> dbset) : base(dbset)
         {
             _usersDbSet = dbset;
+        }
+
+        public Users GetByUniqueId(string uniqueId)
+        {
+            var guid = Guid.Parse(uniqueId);
+            return _usersDbSet.FirstOrDefault(x => x.UniqueId == guid);
         }
 
         public Users GetUser(string email)

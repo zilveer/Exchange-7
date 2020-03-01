@@ -16,5 +16,10 @@ namespace DataAccess.Repository
         {
             return _dbSetUserCredentials.FirstOrDefault(x => x.User.Email == emailOrPhone || x.User.MobileNumber == emailOrPhone);
         }
+
+        public UserCredentials GetByUserId(int userId)
+        {
+            return _dbSetUserCredentials.FirstOrDefault(x => x.UserId == userId);
+        }
     }
 }

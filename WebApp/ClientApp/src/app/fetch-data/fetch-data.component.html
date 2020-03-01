@@ -1,24 +1,24 @@
-<h1 id="tableLabel">Weather forecast</h1>
+<h1 id="tableLabel">Orders</h1>
 
-<p>This component demonstrates fetching data from the server.</p>
+<p>Order of logged in user.</p>
 
-<p *ngIf="!forecasts"><em>Loading...</em></p>
+<p *ngIf="!orders"><em>Loading...</em></p>
 
-<table class='table table-striped' aria-labelledby="tableLabel" *ngIf="forecasts">
+<table class='table table-striped' aria-labelledby="tableLabel" *ngIf="orders">
   <thead>
     <tr>
+      <th>Side</th>
+      <th>Quantity</th>
+      <th>Rate</th>
       <th>Date</th>
-      <th>Temp. (C)</th>
-      <th>Temp. (F)</th>
-      <th>Summary</th>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let forecast of forecasts">
-      <td>{{ forecast.date }}</td>
-      <td>{{ forecast.temperatureC }}</td>
-      <td>{{ forecast.temperatureF }}</td>
-      <td>{{ forecast.summary }}</td>
+    <tr *ngFor="let order of orders">
+      <td>{{ order.isBuy ? "Buy" : "Sell" }}</td>
+      <td>{{ order.quantity }}</td>
+      <td>{{ order.rate }}</td>
+      <td>{{ order.createdOn }}</td>
     </tr>
   </tbody>
 </table>

@@ -3,11 +3,18 @@ using Entity.Partials;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Util;
 
 namespace APIModel.RequestModels
 {
     public class OrderRequestModel : IValidatableObject
     {
+        private readonly ITimeProvider _timeProvider;
+        public OrderRequestModel(ITimeProvider timeProvider)
+        {
+            _timeProvider = timeProvider;
+        }
+
         [Required]
         public short? MarketId { get; set; }
 
@@ -61,7 +68,7 @@ namespace APIModel.RequestModels
             if (IsIcebergOrger == true && IcebergQuantity <= Quantity)
                 errors.Add(new ValidationResult("Invalid Iceberg Quantity.", new[] { nameof(IcebergQuantity) }));
 
-            if (CancelOn < DateTime.UtcNow.AddMinutes(5))
+            if (CancelOn < _timeProvider.GetUtcDateTime().AddMinutes(5))
                 errors.Add(new ValidationResult("Good till date should be future time.", new[] { nameof(CancelOn) }));
 
             if (OrderCondition == Entity.Partials.OrderCondition.BookOrCancel && OrderType == Entity.OrderType.Market)

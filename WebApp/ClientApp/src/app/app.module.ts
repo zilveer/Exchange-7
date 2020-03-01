@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { OAuthModule } from 'angular-oauth2-oidc';
+import { ApiModule, BASE_PATH  } from 'src/ApiService';
 
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
@@ -22,13 +24,20 @@ import { FetchDataComponent } from './fetch-data/fetch-data.component';
     BrowserModule.withServerTransition({ appId: 'ng-cli-universal' }),
     HttpClientModule,
     FormsModule,
+    ApiModule,
+    OAuthModule.forRoot({
+      resourceServer: {
+        allowedUrls: ['https://localhost:44389/api/currencies', 'https://localhost:44389/api/orders'],
+        sendAccessToken: true
+      }
+    }),
     RouterModule.forRoot([
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },
       { path: 'fetch-data', component: FetchDataComponent },
     ])
   ],
-  providers: [],
+  providers: [{ provide: BASE_PATH, useValue: 'https://localhost:44389' }],  
   bootstrap: [AppComponent]
 })
 export class AppModule { }

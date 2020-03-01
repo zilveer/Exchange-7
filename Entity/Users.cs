@@ -14,7 +14,6 @@ namespace Entity
             SendReceiveTransaction = new HashSet<SendReceiveTransaction>();
             SendingAddress = new HashSet<SendingAddress>();
             Transaction = new HashSet<Transaction>();
-            UserCredentials = new HashSet<UserCredentials>();
         }
 
         public int Id { get; set; }
@@ -31,6 +30,7 @@ namespace Entity
         public Guid UniqueId { get; set; }
 
         public virtual KycInfo KycInfo { get; set; }
+        public virtual UserCredentials UserCredentials { get; set; }
         public virtual ICollection<Balance> Balance { get; set; }
         public virtual ICollection<DepositWithdrawRequest> DepositWithdrawRequest { get; set; }
         public virtual ICollection<Orders> Orders { get; set; }
@@ -38,6 +38,5 @@ namespace Entity
         public virtual ICollection<SendReceiveTransaction> SendReceiveTransaction { get; set; }
         public virtual ICollection<SendingAddress> SendingAddress { get; set; }
         public virtual ICollection<Transaction> Transaction { get; set; }
-        public virtual ICollection<UserCredentials> UserCredentials { get; set; }
     }
 }

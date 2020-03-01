@@ -1,0 +1,20 @@
+﻿@using Auth.Models
+@model VerifyTOTPModel
+@{
+	ViewData["Title"] = "VerifyTOTP";
+}
+
+<h1>VerifyTOTP</h1>
+
+@using (Html.BeginForm(FormMethod.Post))
+{
+	@Html.ValidationSummary();
+
+	@Html.AntiForgeryToken()
+	@Html.HiddenFor(x => x.ReturnUrl)
+
+	@Html.LabelFor(x => x.TOTP)
+	@Html.TextBoxFor(x => x.TOTP)
+
+	<button type="submit">Submit</button>
+}

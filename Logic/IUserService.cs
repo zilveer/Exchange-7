@@ -6,5 +6,6 @@ namespace Logic
     {
         Users GetUser(string email);
         Users GetUser(int userId);
+        Users GetByUniqueId(string uniqueId);
     }
 }

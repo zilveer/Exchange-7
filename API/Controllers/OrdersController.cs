@@ -1,6 +1,6 @@
-﻿using APIModel.RequestModels;
+﻿using API.Controllers;
+using APIModel.RequestModels;
 using APIModel.ResponseModels;
-using Entity;
 using Logic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -11,32 +11,45 @@ namespace API
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OrdersController : ControllerBase
+    [Authorize]
+    public class OrdersController : ApiBaseController
     {
         private readonly IOrderService _orderService;
-        public OrdersController(IOrderService orderService)
+        public OrdersController(IOrderService orderService, IUserService userService) : base(userService)
         {
             _orderService = orderService;
         }
 
         [HttpGet]
+        [Authorize("read-orders")]
         public List<OrderResponseModel> Get([FromQuery]PageModel pageModel)
         {
-            return _orderService.GetOrdersForApi(4, pageModel?.PageNumber ?? 1, pageModel?.PageSize ?? 50);
+            var user = GetUser();
+            if (user != null)
+            {
+                return _orderService.GetOrdersForApi(user.Id, pageModel?.PageNumber ?? 1, pageModel?.PageSize ?? 50);
+            }
+            return null;
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(Orders), StatusCodes.Status201Created)]
+        [Authorize("post-orders")]
+        [ProducesResponseType(typeof(OrderResponseModel), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<Orders> Post([FromBody]OrderRequestModel order)
+        public ActionResult<OrderResponseModel> Post([FromBody]OrderRequestModel order)
         {
-            var result = _orderService.PlaceOrder(4, order);
-            if (result.ErrorCode != 0)
+            var user = GetUser();
+            if (user != null)
             {
-                ModelState.AddModelError("", result.ErrorMessage);
-                return BadRequest(ModelState);
+                var result = _orderService.PlaceOrder(user.Id, order);
+                if (result.ErrorCode != 0)
+                {
+                    ModelState.AddModelError("", result.ErrorMessage);
+                    return BadRequest(ModelState);
+                }
+                return result.Entity;
             }
-            return result.Entity;
+            return null;
         }
     }
 }
