@@ -10,6 +10,11 @@ namespace APIModel.RequestModels
     public class OrderRequestModel : IValidatableObject
     {
         private readonly ITimeProvider _timeProvider;
+        public OrderRequestModel()
+        {
+            _timeProvider = new TimeProvider();
+        }
+
         public OrderRequestModel(ITimeProvider timeProvider)
         {
             _timeProvider = timeProvider;
@@ -40,7 +45,6 @@ namespace APIModel.RequestModels
 
         public decimal? IcebergQuantity { get; set; }
 
-        [Required]
         public DateTime? CancelOn { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

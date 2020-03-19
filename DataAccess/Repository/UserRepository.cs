@@ -23,5 +23,9 @@ namespace DataAccess.Repository
         {
             return _usersDbSet.FirstOrDefault(x => x.Email == email);
         }
+        public Users GetUser(int id)
+        {
+            return _usersDbSet.FirstOrDefault(x => x.Id == id);
+        }
     }
 }

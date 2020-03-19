@@ -12,6 +12,7 @@ namespace DataAccess.UnitOfWork
         private IOrdersRepository _ordersRepository;
         private ICurrencyRepository _currencyRepository;
         private IUserCredentialRepository _userCredentialRepository;
+        private IUserRepository _userRepository;
         public UnitOfWork(ExchangeContext dbContext)
         {
             _dbContext = dbContext;
@@ -47,6 +48,17 @@ namespace DataAccess.UnitOfWork
                     _userCredentialRepository = new UserCredentialRepository(_dbContext.Set<UserCredentials>());
 
                 return _userCredentialRepository;
+            }
+        }
+
+        public IUserRepository UserRepository
+        {
+            get
+            {
+                if (_userRepository == null)
+                    _userRepository = new UserRepository(_dbContext.Set<Users>());
+
+                return _userRepository;
             }
         }
 

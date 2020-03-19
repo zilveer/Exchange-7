@@ -2,6 +2,8 @@
 using APIModel.ResponseModels;
 using DataAccess.UnitOfWork;
 using Entity;
+using Infrastructure;
+using OrderMatcher;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +15,12 @@ namespace Logic
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IReadOnlyContext _readOnlyContext;
-        public OrderService(IUnitOfWork unitOfWork, IReadOnlyContext readOnlyContext)
+        private readonly IQueueProducer _queueProducer;
+        public OrderService(IUnitOfWork unitOfWork, IReadOnlyContext readOnlyContext, IQueueProducer queueProducer)
         {
             _unitOfWork = unitOfWork;
             _readOnlyContext = readOnlyContext;
+            _queueProducer = queueProducer;
         }
 
         public Orders FindById(int id)
@@ -42,9 +46,46 @@ namespace Logic
                 if (result.ErrorCode == 0)
                 {
                     var entity = uow.OrdersRepository.Find(result.OrderId);
+                    SendNewOrderRequest(entity);
                     bor.Entity = Convert(entity);
                 }
                 return bor;
+            }
+        }
+
+        public BusinessOperationResult CancelOrder(int userId, int orderId)
+        {
+            using (var uow = _unitOfWork.GetNewUnitOfWork())
+            {
+                var order = uow.OrdersRepository.Find(orderId);
+                if (order != null && order.UserId == userId)
+                {
+                    if (order.OrderStatus == Entity.Partials.OrderStatus.Accepted || order.OrderStatus == Entity.Partials.OrderStatus.Received)
+                    {
+                        SendCancelRequest(order.Id);
+                        return new BusinessOperationResult { ErrorMessage = "Cancel request accepted." };
+                    }
+                    else if (order.OrderStatus == Entity.Partials.OrderStatus.Cancelled)
+                    {
+                        return new BusinessOperationResult { ErrorCode = 1, ErrorMessage = "Order is already cancelled." };
+                    }
+                    else if (order.OrderStatus == Entity.Partials.OrderStatus.Filled)
+                    {
+                        return new BusinessOperationResult { ErrorCode = 1, ErrorMessage = "Order is already filled." };
+                    }
+                    else if (order.OrderStatus == Entity.Partials.OrderStatus.Rejected)
+                    {
+                        return new BusinessOperationResult { ErrorCode = 1, ErrorMessage = "Order is already rejected." };
+                    }
+                    else
+                    {
+                        return new BusinessOperationResult { ErrorCode = 1, ErrorMessage = "Order can not be cancelled." };
+                    }
+                }
+                else
+                {
+                    return new BusinessOperationResult { ErrorCode = 1, ErrorMessage = "Order not found" };
+                }
             }
         }
 
@@ -71,6 +112,37 @@ namespace Logic
                 TradeFeeId = x.TradeFeeId,
                 IcebergQuantity = x.IcebergQuantity.HasValue ? x.IcebergQuantity.Value.ToCoin() : (decimal?)null
             };
+        }
+
+        private void SendNewOrderRequest(Orders order)
+        {
+            var orderWrapper = new OrderWrapper();
+            orderWrapper.Order = new Order();
+
+            orderWrapper.Order.OrderId = order.Id;
+            orderWrapper.Order.IsBuy = order.Side;
+            orderWrapper.Order.Price = order.Rate;
+            orderWrapper.Order.OpenQuantity = order.QuantityRemaining;
+            orderWrapper.Order.IsStop = order.StopRate != 0;
+            orderWrapper.OrderCondition = (OrderCondition)((byte)order.OrderCondition);
+            orderWrapper.StopPrice = order.StopRate;
+            orderWrapper.TipQuantity = order.IcebergQuantity > 0 ? order.Quantity : 0;
+            orderWrapper.TotalQuantity = order.IcebergQuantity ?? 0;
+            if (order.CancelOn.HasValue)
+            {
+                DateTime Jan1970 = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                orderWrapper.Order.CancelOn = (int)order.CancelOn.Value.Subtract(Jan1970).TotalSeconds;
+            }
+
+            var bytes = OrderSerializer.Serialize(orderWrapper);
+            _queueProducer.Produce(bytes);
+        }
+
+        private void SendCancelRequest(int orderId)
+        {
+            var cancelRequest = new CancelRequest() { OrderId = orderId };
+            var bytes = CancelRequestSerializer.Serialize(cancelRequest);
+            _queueProducer.Produce(bytes);
         }
     }
 }

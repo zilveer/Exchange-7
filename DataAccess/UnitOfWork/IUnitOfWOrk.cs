@@ -8,6 +8,7 @@ namespace DataAccess.UnitOfWork
         IOrdersRepository OrdersRepository { get; }
         ICurrencyRepository CurrencyRepository { get; }
         IUserCredentialRepository UserCredentialRepository { get; }
+        IUserRepository UserRepository { get; }
         void SaveChanges();
         IUnitOfWork GetNewUnitOfWork();
     }

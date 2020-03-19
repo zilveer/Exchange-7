@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NSwag;
+using NSwag.AspNetCore;
+using NSwag.Generation.Processors.Security;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace API
 {
@@ -34,7 +39,17 @@ namespace API
             {
                 options.AddPolicy("read-orders", builder =>
                 {
-                    builder.RequireScope("orders:read");
+                    builder.RequireScope("orders:read", "orders:write");
+                });
+
+                options.AddPolicy("post-orders", builder =>
+                {
+                    builder.RequireScope("orders:write");
+                });
+
+                options.AddPolicy("read-balance", builder =>
+                {
+                    builder.RequireScope("balance:read");
                 });
             });
             services.AddSwaggerDocument(config =>
@@ -42,6 +57,19 @@ namespace API
                 config.Title = "Exchange API";
                 config.Version = "0.9";
                 config.OperationProcessors.Add(new AddRequiredHeaderParameter());
+                config.AddSecurity("bearer", Enumerable.Empty<string>(), new OpenApiSecurityScheme
+                {
+                    Type = OpenApiSecuritySchemeType.OAuth2,
+                    Flow = OpenApiOAuth2Flow.Implicit,
+                    AuthorizationUrl = "https://localhost:44326/connect/authorize",
+                    Scopes = new Dictionary<string, string>()
+                    {
+                        { "orders:read", "read orders" },
+                        { "orders:write", "place and cancel orders" },
+                        { "balance:read", "read balance" },
+                    }
+                });
+                config.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor("bearer"));
             });
         }
 
@@ -69,7 +97,15 @@ namespace API
                     endpoints.MapControllers();
                 });
             app.UseOpenApi();
-            app.UseSwaggerUi3();
+            app.UseSwaggerUi3(settings =>
+            {
+                settings.OAuth2Client = new OAuth2ClientSettings
+                {
+                    ClientId = "brvesqplaedoadrhklar",
+                    ClientSecret = "sbowplazhpgtbtrnbaswxquzbazggkxu",
+                    AppName = "WebAppAuth",
+                };
+            });
         }
     }
 }

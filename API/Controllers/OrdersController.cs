@@ -25,11 +25,7 @@ namespace API
         public List<OrderResponseModel> Get([FromQuery]PageModel pageModel)
         {
             var user = GetUser();
-            if (user != null)
-            {
-                return _orderService.GetOrdersForApi(user.Id, pageModel?.PageNumber ?? 1, pageModel?.PageSize ?? 50);
-            }
-            return null;
+            return _orderService.GetOrdersForApi(user.Id, pageModel?.PageNumber ?? 1, pageModel?.PageSize ?? 50);
         }
 
         [HttpPost]
@@ -39,17 +35,29 @@ namespace API
         public ActionResult<OrderResponseModel> Post([FromBody]OrderRequestModel order)
         {
             var user = GetUser();
-            if (user != null)
+            var result = _orderService.PlaceOrder(user.Id, order);
+            if (result.ErrorCode != 0)
             {
-                var result = _orderService.PlaceOrder(user.Id, order);
-                if (result.ErrorCode != 0)
-                {
-                    ModelState.AddModelError("", result.ErrorMessage);
-                    return BadRequest(ModelState);
-                }
-                return result.Entity;
+                ModelState.AddModelError("", result.ErrorMessage);
+                return BadRequest(ModelState);
             }
-            return null;
+            return result.Entity;
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize("post-orders")]
+        [ProducesResponseType(typeof(OrderResponseModel), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult Delete(int id)
+        {
+            var user = GetUser();
+            var result = _orderService.CancelOrder(user.Id, id);
+            if (result.ErrorCode != 0)
+            {
+                ModelState.AddModelError("", result.ErrorMessage);
+                return BadRequest(ModelState);
+            }
+            return Ok();
         }
     }
 }

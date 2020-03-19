@@ -9,6 +9,7 @@ namespace Logic
     {
         Orders FindById(int id);
         BusinessOperationResult<OrderResponseModel> PlaceOrder(int userId, OrderRequestModel orderRequestModel);
+        BusinessOperationResult CancelOrder(int userId, int orderId);
         List<OrderResponseModel> GetOrdersForApi(int userId, int pageNumber = 1, int pageSize = 50);
     }
 }
